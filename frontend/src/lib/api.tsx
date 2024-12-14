@@ -76,3 +76,20 @@ export async function getUser() {
     }
 }
 
+export async function runScan(repo: string, sha: string) {
+    const response = await fetch(`${API_URL}/scan`, {
+        headers: {
+            Authorization: `Bearer ${getCookie("access_token")}`,
+            "Content-Type": "application/json",
+        },
+        method: "POST",
+        body: JSON.stringify({ repo, sha }),
+    });
+
+    if (response.ok) {
+        return response.json();
+    } else {
+        throw new Error("Failed to run scan");
+    }
+}
+

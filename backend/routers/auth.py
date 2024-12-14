@@ -20,6 +20,7 @@ router = APIRouter(
     responses={404: {"description": "Not found"}},
 )
 
+
 @router.post("/github")
 async def github_oauth(data: schemas.GithubOAuth, session: SessionDep):
     if not data.code:
@@ -44,11 +45,13 @@ async def github_oauth(data: schemas.GithubOAuth, session: SessionDep):
         session.commit()
         session.refresh(db_user)
     else:
-        new_user = UserCreate(username=handle, avatar_url=avatar, github_access_token=access_token)
+        new_user = UserCreate(
+            username=handle, avatar_url=avatar, github_access_token=access_token
+        )
         new_db_user = User.model_validate(new_user)
         session.add(new_db_user)
         session.commit()
-        session.refresh(new_db_user)    
+        session.refresh(new_db_user)
     access_token_expires = timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
     access_token = create_access_token(
         data={"sub": handle}, expires_delta=access_token_expires

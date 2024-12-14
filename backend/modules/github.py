@@ -1,15 +1,16 @@
 import requests
 from config import GITHUB_APP_CLIENT_ID, GITHUB_APP_CLIENT_SECRET
 
+
 def login_oauth(code: str) -> requests.Response:
     r = requests.post(
         "https://github.com/login/oauth/access_token",
         data={
             "client_id": GITHUB_APP_CLIENT_ID,
             "client_secret": GITHUB_APP_CLIENT_SECRET,
-            "code": code
+            "code": code,
         },
-        headers={"Accept": "application/json"}
+        headers={"Accept": "application/json"},
     )
     return r
 
@@ -20,8 +21,8 @@ def get_user(token: str) -> requests.Response:
         headers={
             "Accept": "application/json",
             "Content-Type": "application/json",
-            "Authorization": f"Bearer {token}"
-        }
+            "Authorization": f"Bearer {token}",
+        },
     )
     return r
 
@@ -32,8 +33,8 @@ def get_repos(token: str) -> requests.Response:
         headers={
             "Accept": "application/json",
             "Content-Type": "application/json",
-            "Authorization": f"Bearer {token}"
-        }
+            "Authorization": f"Bearer {token}",
+        },
     )
     return r
 
@@ -46,8 +47,8 @@ def get_repos_branches(token: str, repos: list) -> requests.Response:
             headers={
                 "Accept": "application/json",
                 "Content-Type": "application/json",
-                "Authorization": f"Bearer {token}"
-            }
+                "Authorization": f"Bearer {token}",
+            },
         )
         repo["branches"] = r.json()
         final.append(repo)
@@ -57,12 +58,8 @@ def get_repos_branches(token: str, repos: list) -> requests.Response:
 def get_commits(token: str, owner: str, repo: str, branch: str) -> requests.Response:
     r = requests.get(
         f"https://api.github.com/repos/{owner}/{repo}/commits",
-        headers={
-            "Authorization": f"Bearer {token}"
-        },
-        params={
-            "sha": branch
-        }
+        headers={"Authorization": f"Bearer {token}"},
+        params={"sha": branch},
     )
     return r
 
@@ -70,8 +67,6 @@ def get_commits(token: str, owner: str, repo: str, branch: str) -> requests.Resp
 def get_commit(token: str, owner: str, repo: str, sha: str) -> requests.Response:
     r = requests.get(
         f"https://api.github.com/repos/{owner}/{repo}/commits/{sha}",
-        headers={
-            "Authorization": f"Bearer {token}"
-        }
+        headers={"Authorization": f"Bearer {token}"},
     )
     return r

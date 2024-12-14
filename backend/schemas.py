@@ -11,6 +11,7 @@ class UserProfile(BaseModel):
     username: str
     avatar_url: str
 
+
 class UserCreate(UserBase):
     github_access_token: str
     pass
@@ -23,16 +24,15 @@ class User(UserBase):
         from_attributes = True
 
 
-
-
 class GithubOAuth(BaseModel):
     code: str
-    
+
 
 class CommitInfo(BaseModel):
     message: str
     author: dict
-    
+
+
 class File(BaseModel):
     filename: str
     status: str
@@ -41,12 +41,13 @@ class File(BaseModel):
     changes: int
     raw_url: str
     patch: str
-    
-    
+
+
 class Commit(BaseModel):
     sha: str
     commit: Optional[CommitInfo] = None
     files: Optional[List[File]] = None
+
 
 class CommitRef(BaseModel):
     sha: str
@@ -55,7 +56,8 @@ class CommitRef(BaseModel):
 class Branch(BaseModel):
     name: str
     commit: CommitRef
-    
+
+
 class Repo(BaseModel):
     id: int
     name: str
@@ -67,8 +69,8 @@ class Repo(BaseModel):
 class GetCommits(BaseModel):
     repo: str
     branch: Optional[str] = ""
-    
-    
+
+
 class GetCommit(BaseModel):
     sha: str
     repo: str

@@ -10,8 +10,8 @@ command = "/path/to/your-executable"
 try:
     image, logs = client.images.build(path=context_path, tag=image_name, rm=True)
     for log in logs:
-        if 'stream' in log:
-            print(log['stream'].strip())
+        if "stream" in log:
+            print(log["stream"].strip())
     print(f"Image '{image_name}' built successfully.")
 except docker.errors.BuildError as e:
     print(f"Error during Docker build: {e}")
@@ -53,4 +53,3 @@ finally:
     # Cleanup container and context
     if container:
         container.remove(force=True)
-

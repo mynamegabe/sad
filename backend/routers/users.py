@@ -9,6 +9,7 @@ from utils.common import get_current_active_user
 router = APIRouter()
 SessionDep = Annotated[Session, Depends(get_session)]
 
+
 @router.get("/users/", tags=["users"])
 async def read_users(session: SessionDep):
     users = session.exec(select(User)).all()
@@ -20,5 +21,3 @@ async def read_users_me(
     current_user: Annotated[User, Depends(get_current_active_user)],
 ):
     return current_user
-    
-    

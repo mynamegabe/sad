@@ -23,8 +23,10 @@ class Token(BaseModel):
     access_token: str
     token_type: str
 
+
 class TokenData(BaseModel):
     username: str | None = None
+
 
 def hash_password(password: str) -> str:
     md5_hash = hashlib.md5()
@@ -35,7 +37,7 @@ def hash_password(password: str) -> str:
 
 def random_string(length: int) -> str:
     characters = string.ascii_letters + string.digits
-    return ''.join(random.choice(characters) for i in range(length))
+    return "".join(random.choice(characters) for i in range(length))
 
 
 def create_access_token(data: dict, expires_delta: timedelta | None = None):
@@ -49,7 +51,9 @@ def create_access_token(data: dict, expires_delta: timedelta | None = None):
     return encoded_jwt
 
 
-async def get_current_user(token: Annotated[str, Depends(oauth2_scheme)], session: SessionDep):
+async def get_current_user(
+    token: Annotated[str, Depends(oauth2_scheme)], session: SessionDep
+):
     credentials_exception = HTTPException(
         status_code=status.HTTP_401_UNAUTHORIZED,
         detail="Could not validate credentials",
@@ -71,7 +75,7 @@ async def get_current_user(token: Annotated[str, Depends(oauth2_scheme)], sessio
 
 
 async def get_current_active_user(
-current_user: Annotated[User, Depends(get_current_user)],
+    current_user: Annotated[User, Depends(get_current_user)],
 ):
     return current_user
 

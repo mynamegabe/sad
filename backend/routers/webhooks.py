@@ -20,9 +20,9 @@ router = APIRouter(
     responses={404: {"description": "Not found"}},
 )
 
+
 @router.post("/github")
 async def github_webhook(request: Request):
     data = await request.json()
     print(data)
     return {"status": "ok"}
-    
