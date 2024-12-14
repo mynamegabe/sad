@@ -1,0 +1,10 @@
+fastapi
+uvicorn
+werkzeug
+python-multipart
+sqlmodel
+mysql-python
+pyjwt
+
+google-generativeai
+google-api-python-client
