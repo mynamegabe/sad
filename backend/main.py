@@ -116,10 +116,13 @@ async def scan_commit(
         current_user.github_access_token, current_user.username, params.repo, params.sha
     )
     commit_json = r.json()
+    # print(commit_json)
     output_list = []
     if commit_json["files"]:
         files_changed = len(commit_json["files"])
         for i in range(files_changed):
+            if "patch" not in commit_json["files"][i]:
+                continue
             filename = commit_json["files"][i]["filename"]
             raw_url = commit_json["files"][i]["raw_url"]
             original_code = requests.get(raw_url).text
@@ -157,7 +160,8 @@ async def scan_commit(
                 reason = LLM_response["candidates"][0]["content"]["parts"][0]["text"]
                 output_list.append({filename: f"{reason}"})
             elif "NO" in yes_no:
-                output_list.append({f"{filename}": "NO"})
+                # output_list.append({f"{filename}": "NO"})
+                pass
             else:
                 output_list.append({f"{filename}": "ERR"})
 

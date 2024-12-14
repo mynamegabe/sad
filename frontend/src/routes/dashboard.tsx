@@ -62,17 +62,16 @@ function RouteComponent() {
     getLoader();
   }, []);
 
-  useEffect(() => {
-    if (!selectedRepo || !selectedBranch) return;
+  async function retrieveCommits(repo, branch) {
     setTableLoading(true);
     async function fetchCommits() {
-      const data = await getCommits(selectedRepo, selectedBranch);
+      const data = await getCommits(repo, branch);
       setCommits(data.commits);
       setScans(data.scans);
       setTableLoading(false);
     }
     fetchCommits();
-  }, [selectedBranch]);
+  }
 
   return (
     <div className="flex">
@@ -91,6 +90,11 @@ function RouteComponent() {
             </div>
           ) : null}
           <div>
+            <h1 className="text-stone-400">Sandbox</h1>
+            <Button asChild variant="primary">
+              <Link href="/sandbox">Go to Sandbox</Link>
+            </Button>
+
             <h1 className="text-stone-400">Repositories</h1>
 
             <Accordion
@@ -113,6 +117,7 @@ function RouteComponent() {
                               onClick={() => {
                                 setSelectedRepo(repo.name);
                                 setSelectedBranch(branch.name);
+                                retrieveCommits(repo.name, branch.name);
                               }}
                             >
                               {branch.name}
@@ -131,7 +136,7 @@ function RouteComponent() {
           <p className="dark:text-white">Selected Repo: {selectedRepo}</p>
           <p className="dark:text-white">Selected Branch: {selectedBranch}</p>
           <Button asChild variant="destructive">
-            <Link href="/logout">Logout</Link>
+            <Link href="/">Logout</Link>
           </Button>
         </div>
       </div>
@@ -163,7 +168,7 @@ function RouteComponent() {
                     <TableCell>
                       {scans[commit.sha]
                         ? Object.keys(scans[commit.sha]).length
-                        : 0}
+                        : "Run scan...."}
                     </TableCell>
                     <TableCell>
                       {scans[commit.sha] ? (
@@ -188,8 +193,12 @@ function RouteComponent() {
                                     {scans[commit.sha].map((file) => {
                                       return (
                                         <TableRow>
-                                          <TableCell>{Object.keys(file)[0]}</TableCell>
-                                          <TableCell>{file[Object.keys(file)[0]]}</TableCell>
+                                          <TableCell>
+                                            {Object.keys(file)[0]}
+                                          </TableCell>
+                                          <TableCell>
+                                            {file[Object.keys(file)[0]]}
+                                          </TableCell>
                                         </TableRow>
                                       );
                                     })}

@@ -13,6 +13,7 @@ import { createFileRoute } from '@tanstack/react-router'
 // Import Routes
 
 import { Route as rootRoute } from './routes/__root'
+import { Route as SandboxImport } from './routes/sandbox'
 import { Route as DashboardImport } from './routes/dashboard'
 import { Route as GithubCallbackImport } from './routes/github/callback'
 
@@ -21,6 +22,12 @@ import { Route as GithubCallbackImport } from './routes/github/callback'
 const IndexLazyImport = createFileRoute('/')()
 
 // Create/Update Routes
+
+const SandboxRoute = SandboxImport.update({
+  id: '/sandbox',
+  path: '/sandbox',
+  getParentRoute: () => rootRoute,
+} as any)
 
 const DashboardRoute = DashboardImport.update({
   id: '/dashboard',
@@ -58,6 +65,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof DashboardImport
       parentRoute: typeof rootRoute
     }
+    '/sandbox': {
+      id: '/sandbox'
+      path: '/sandbox'
+      fullPath: '/sandbox'
+      preLoaderRoute: typeof SandboxImport
+      parentRoute: typeof rootRoute
+    }
     '/github/callback': {
       id: '/github/callback'
       path: '/github/callback'
@@ -73,12 +87,14 @@ declare module '@tanstack/react-router' {
 export interface FileRoutesByFullPath {
   '/': typeof IndexLazyRoute
   '/dashboard': typeof DashboardRoute
+  '/sandbox': typeof SandboxRoute
   '/github/callback': typeof GithubCallbackRoute
 }
 
 export interface FileRoutesByTo {
   '/': typeof IndexLazyRoute
   '/dashboard': typeof DashboardRoute
+  '/sandbox': typeof SandboxRoute
   '/github/callback': typeof GithubCallbackRoute
 }
 
@@ -86,27 +102,30 @@ export interface FileRoutesById {
   __root__: typeof rootRoute
   '/': typeof IndexLazyRoute
   '/dashboard': typeof DashboardRoute
+  '/sandbox': typeof SandboxRoute
   '/github/callback': typeof GithubCallbackRoute
 }
 
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/dashboard' | '/github/callback'
+  fullPaths: '/' | '/dashboard' | '/sandbox' | '/github/callback'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/dashboard' | '/github/callback'
-  id: '__root__' | '/' | '/dashboard' | '/github/callback'
+  to: '/' | '/dashboard' | '/sandbox' | '/github/callback'
+  id: '__root__' | '/' | '/dashboard' | '/sandbox' | '/github/callback'
   fileRoutesById: FileRoutesById
 }
 
 export interface RootRouteChildren {
   IndexLazyRoute: typeof IndexLazyRoute
   DashboardRoute: typeof DashboardRoute
+  SandboxRoute: typeof SandboxRoute
   GithubCallbackRoute: typeof GithubCallbackRoute
 }
 
 const rootRouteChildren: RootRouteChildren = {
   IndexLazyRoute: IndexLazyRoute,
   DashboardRoute: DashboardRoute,
+  SandboxRoute: SandboxRoute,
   GithubCallbackRoute: GithubCallbackRoute,
 }
 
@@ -122,6 +141,7 @@ export const routeTree = rootRoute
       "children": [
         "/",
         "/dashboard",
+        "/sandbox",
         "/github/callback"
       ]
     },
@@ -130,6 +150,9 @@ export const routeTree = rootRoute
     },
     "/dashboard": {
       "filePath": "dashboard.tsx"
+    },
+    "/sandbox": {
+      "filePath": "sandbox.tsx"
     },
     "/github/callback": {
       "filePath": "github/callback.tsx"
