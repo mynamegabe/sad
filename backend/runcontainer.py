@@ -3,7 +3,7 @@ import docker
 client = docker.from_env()
 
 image_name = "sandbox-container"
-context_path = "./Dockerfile"
+context_path = "./sandbox/Dockerfile"
 command = "/path/to/your-executable"
 
 # build docker container
