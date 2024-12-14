@@ -17,6 +17,14 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
 
 // import Image from "next/image";
 // import { API_URL } from "@/lib/utils";
@@ -33,6 +41,7 @@ function RouteComponent() {
   const [selectedRepo, setSelectedRepo] = useState("");
   const [selectedBranch, setSelectedBranch] = useState("");
   const [commits, setCommits] = useState([]);
+  const [scans, setScans] = useState([]);
   const [tableLoading, setTableLoading] = useState(true);
 
   useEffect(() => {
@@ -58,7 +67,8 @@ function RouteComponent() {
     setTableLoading(true);
     async function fetchCommits() {
       const data = await getCommits(selectedRepo, selectedBranch);
-      setCommits(data);
+      setCommits(data.commits);
+      setScans(data.scans);
       setTableLoading(false);
     }
     fetchCommits();
@@ -139,6 +149,7 @@ function RouteComponent() {
                 <TableHead className="w-[100px]">Commit</TableHead>
                 <TableHead>Author</TableHead>
                 <TableHead>Date</TableHead>
+                <TableHead>Suspicious Files</TableHead>
                 <TableHead>Actions</TableHead>
               </TableRow>
             </TableHeader>
@@ -150,14 +161,52 @@ function RouteComponent() {
                     <TableCell>{commit.commit.author.name}</TableCell>
                     <TableCell>{commit.commit.author.date}</TableCell>
                     <TableCell>
-                      <Button
-                        variant="secondary"
-                        onClick={() =>
-                          runScan(selectedRepo, selectedBranch, commit.sha)
-                        }
-                      >
-                        Scan
-                      </Button>
+                      {scans[commit.sha]
+                        ? Object.keys(scans[commit.sha]).length
+                        : 0}
+                    </TableCell>
+                    <TableCell>
+                      {scans[commit.sha] ? (
+                        <Dialog>
+                          <DialogTrigger asChild>
+                            <Button variant="secondary">View</Button>
+                          </DialogTrigger>
+                          <DialogContent>
+                            <DialogHeader>
+                              <DialogTitle>
+                                Suspicious Files in Commit {commit.sha}
+                              </DialogTitle>
+                              <DialogDescription>
+                                <Table>
+                                  <TableHeader>
+                                    <TableRow>
+                                      <TableHead>File</TableHead>
+                                      <TableHead>Reason</TableHead>
+                                    </TableRow>
+                                  </TableHeader>
+                                  <TableBody>
+                                    {scans[commit.sha].map((file) => {
+                                      return (
+                                        <TableRow>
+                                          <TableCell>{Object.keys(file)[0]}</TableCell>
+                                          <TableCell>{file[Object.keys(file)[0]]}</TableCell>
+                                        </TableRow>
+                                      );
+                                    })}
+                                  </TableBody>
+                                </Table>
+                              </DialogDescription>
+                            </DialogHeader>
+                          </DialogContent>
+                        </Dialog>
+                      ) : (
+                        <Button
+                          variant="secondary"
+                          onClick={() => runScan(selectedRepo, commit.sha)}
+                        >
+                          Scan
+                        </Button>
+                      )}
                     </TableCell>
                   </TableRow>
                 );

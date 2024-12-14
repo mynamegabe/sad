@@ -1,5 +1,6 @@
 from typing import Annotated
 from sqlmodel import Field, Session, SQLModel, create_engine, select
+from sqlalchemy.dialects.mysql import LONGTEXT
 from config import DB_HOST, DB_NAME, DB_PASSWORD, DB_USERNAME
 
 
@@ -14,20 +15,21 @@ class User(SQLModel, table=True):
 
 class Scan(SQLModel, table=True):
     id: int | None = Field(default=None, primary_key=True)
-    user_id: int
-    repo_name: str
-    branch_name: str
-    commit_sha: str
-    scan_status: str
-    scan_result: str
-    last_scanned: str
+    user_id: int = Field(index=True)
+    repo_name: str = Field()
+    # branch_name: str = Field()
+    commit_sha: str = Field()
+    scan_status: str = Field()
+    scan_result: str | None = Field()
+    last_scanned: str = Field()
     
 
 class SuspiciousFiles(SQLModel, table=True):
     id: int | None = Field(default=None, primary_key=True)
-    scan_id: int
+    scan_id: int 
     filename: str
-    reason: str
+    # reason should be a very long string
+    reason: str = Field(sa_type=LONGTEXT)
 
 # mysql
 db_url = f"mysql+pymysql://{DB_USERNAME}:{DB_PASSWORD}@{DB_HOST}/{DB_NAME}"

@@ -14,14 +14,15 @@ from sqlmodel import select
 from typing import Annotated, Optional, List
 from routers import users, auth, webhooks
 from utils.common import hash_password, random_string
-from utils.db import Session, get_session, User, create_db_and_tables
+from utils.db import Session, get_session, User, create_db_and_tables, Scan, SuspiciousFiles
 from utils.common import get_current_active_user
 from modules.github import *
 from config import *
 from werkzeug.utils import secure_filename
 import uvicorn
-from schemas import Repo, Commit, GetCommits, GetCommit, CommitRef
+from schemas import Repo, Commit, GetCommits, GetCommit, CommitRef, CommitsResponse
 import requests
+from datetime import datetime
 
 
 SessionDep = Annotated[Session, Depends(get_session)]
@@ -66,19 +67,32 @@ async def http_get_repos(
     return repos
 
 
-@app.post("/commits", response_model=List[Commit])
+@app.post("/commits", response_model=CommitsResponse)
 async def http_get_commits(
-    params: GetCommits, current_user: Annotated[User, Depends(get_current_active_user)]
-) -> List[Commit]:
+    params: GetCommits, current_user: Annotated[User, Depends(get_current_active_user)], session: SessionDep
+):
     r = get_commits(
         current_user.github_access_token,
         current_user.username,
         params.repo,
         params.branch,
     )
+    # select all scans of this repo
+    scans = session.exec(select(Scan).filter(Scan.repo_name == params.repo)).all()
+    scan_dict = {}
+    for i in scans:
+        # get files
+        suspicious_files = session.exec(select(SuspiciousFiles).filter(SuspiciousFiles.scan_id == i.id)).all()
+        scan_dict[i.commit_sha] = []
+        for j in suspicious_files:
+            scan_dict[i.commit_sha].append({j.filename: j.reason})
+            
+        
     commits = r.json()
-    print(commits)
-    return commits
+    return {
+        "commits": commits,
+        "scans": scan_dict
+    }
 
 
 @app.get("/commit", response_model=Commit)
@@ -96,7 +110,7 @@ async def http_get_commit(
 
 @app.post("/scan", response_model=List[dict])
 async def scan_commit(
-    params: GetCommit, current_user: Annotated[User, Depends(get_current_active_user)]
+    params: GetCommit, current_user: Annotated[User, Depends(get_current_active_user)], session: SessionDep
 ):
     r = get_commit(
         current_user.github_access_token, current_user.username, params.repo, params.sha
@@ -132,7 +146,7 @@ async def scan_commit(
 
             yes_no = LLM_response_text[-6:].upper()
             if "YES" in yes_no:
-                output_list.append({f"{filename}": "YES"})
+                # output_list.append({f"{filename}": "YES"})
 
                 prompt = f"why is this malicious ?\n{code_patch}"
                 LLM_query = {"contents": [{"parts": [{"text": f"{prompt}"}]}]}
@@ -141,12 +155,43 @@ async def scan_commit(
                 )
                 LLM_response = LLM_request.json()
                 reason = LLM_response["candidates"][0]["content"]["parts"][0]["text"]
-                output_list.append({"REASON": f"{reason}"})
+                output_list.append({filename: f"{reason}"})
             elif "NO" in yes_no:
                 output_list.append({f"{filename}": "NO"})
             else:
                 output_list.append({f"{filename}": "ERR"})
 
+    # delete previous scan of this commit in the repo
+    previous_scan = session.exec(select(Scan).filter(Scan.commit_sha == params.sha, Scan.repo_name == params.repo)).first()
+    if previous_scan:
+        session.delete(previous_scan)
+        session.commit()
+        # delete previous suspicious files
+        previous_suspicious_files = session.exec(select(SuspiciousFiles).filter(SuspiciousFiles.scan_id == previous_scan.id)).all()
+        for i in previous_suspicious_files:
+            session.delete(i)
+        session.commit()
+        
+
+    # update db
+    scan = Scan(
+        user_id=current_user.id,
+        repo_name=params.repo,
+        commit_sha=params.sha,
+        scan_status="COMPLETED",
+        last_scanned=datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+    )
+    session.add(scan)
+    session.commit()
+    
+    for i in output_list:
+        suspicious_file = SuspiciousFiles(
+            scan_id=scan.id,
+            filename=list(i.keys())[0],
+            reason=list(i.values())[0],
+        )
+        session.add(suspicious_file)
+        session.commit()
     return output_list
 
 

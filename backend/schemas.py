@@ -51,6 +51,11 @@ class Commit(BaseModel):
 
 class CommitRef(BaseModel):
     sha: str
+    
+    
+class CommitsResponse(BaseModel):
+    commits: List[Commit]
+    scans: dict
 
 
 class Branch(BaseModel):
