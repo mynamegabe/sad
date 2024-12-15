@@ -19,13 +19,13 @@ def build_container(image_name, context_path):
         print(f"Error during Docker build: {e}")
         return 1
 
-def run_container(image_name, command):
+def run_container(image_name):
     # run docker container
     try:
         client = docker.from_env()
         # container = client.containers.run(image_name, command=command, remove=True)
-        volume_bindings = { 'sandbox/mount_point': { 'bind': '/app', 'mode': 'rwx', }, }
-        container = client.containers.run(image_name, volumes=volumes, detach=True)
+        volume_bindings = { os.getcwd()+'/sandbox/mount_point': { 'bind': '/app', 'mode': 'rw', }, }
+        container = client.containers.run(image_name, volumes=volume_bindings, detach=True)
         print("Container ran successfully. Output:")
         print(f"Container '{container}' is running...")
 
@@ -66,7 +66,7 @@ image_name = "sandbox-container"
 context_path = "sandbox/benchmarker"
 executable = "ls_mainexe"
 build_container(image_name, context_path)
-run_container(image_name=image_name, command=executable)
+run_container(image_name=image_name)
 
 # sandbox_folders = os.listdir(context_path)
 # for folder_name in sandbox_folders:
