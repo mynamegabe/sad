@@ -8,6 +8,22 @@ export const Route = createFileRoute("/sandbox")({
 });
 
 function RouteComponent() {
+
+  async function onSubmit(event: React.FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+    const formData = new FormData(event.currentTarget);
+    const files = formData.get("files") as FileList;
+    const script = formData.get("script") as string;
+    const data = new FormData();
+    data.append("script", script);
+    data.append("file", files[0]);
+    const response = await fetch("/sandbox", {
+      method: "POST",
+      body: data,
+    });
+    console.log(response);
+  }
+
   return (
     <div className="p-4">
       <h1 className="text-2xl font-bold">Sandbox</h1>
@@ -23,7 +39,9 @@ function RouteComponent() {
 ./testbin"
           className="h-64"
         />
-        <Button type="submit">Run</Button>
+        <Button type="submit"
+          onClick={() => onSubmit}
+        >Run</Button>
       </form>
     </div>
   );
