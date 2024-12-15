@@ -21,6 +21,10 @@ RUN pip install EntropyAnalysis
 COPY benchmark.sh benchmark.sh
 
 COPY run.sh run.sh
+COPY . .
 
+RUN chmod +x benchmark.sh
 # Start a shell, execute the binary from the command line, and then run ps
 CMD sh -c "./run.sh $1"
+# CMD ["sh", "/app/benchmark.sh"]
+
