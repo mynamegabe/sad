@@ -206,5 +206,31 @@ async def scan_commit(
     return output_list
 
 
+# get uplaoded file and text
+@app.post("/sandbox")
+async def sandbox_test(file: UploadFile = File(None), script: str = Form(None)):
+    # make tmp folder
+    import os
+    os.makedirs("tmp", exist_ok=True)
+    # make random folder
+    random_folder = random_string(10)
+    os.makedirs(f"tmp/{random_folder}", exist_ok=True)
+    # save file
+    if file:
+        filename = secure_filename(file.filename)
+        file_path = f"tmp/{random_folder}/{filename}"
+        with open(file_path, "wb") as f:
+            f.write(file.file.read())
+    # save script
+    if script:
+        with open(f"tmp/{random_folder}/run.sh", "w") as f:
+            f.write(script)
+    # build container
+    image_name = "sandbox-container"
+    context_path = "./sandbox/benchmarker/Dockerfile"
+    build_container(image_name, context_path)
+    run_container(image_name=image_name, volume=f"tmp/{random_folder}:/sandbox")
+    return {"status": "success"}
+
 if __name__ == "__main__":
     uvicorn.run("main:app", host="0.0.0.0", port=80, reload=True)
