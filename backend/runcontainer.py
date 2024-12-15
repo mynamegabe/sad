@@ -24,7 +24,8 @@ def run_container(image_name, command):
     try:
         client = docker.from_env()
         # container = client.containers.run(image_name, command=command, remove=True)
-        container = client.containers.run(image_name, detach=True)
+        volume_bindings = { 'sandbox/mount_point': { 'bind': '/app', 'mode': 'rwx', }, }
+        container = client.containers.run(image_name, volumes=volumes, detach=True)
         print("Container ran successfully. Output:")
         print(f"Container '{container}' is running...")
 
