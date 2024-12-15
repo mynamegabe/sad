@@ -23,7 +23,7 @@ import uvicorn
 from schemas import Repo, Commit, GetCommits, GetCommit, CommitRef, CommitsResponse
 import requests
 from datetime import datetime
-
+from runcontainer import build_container, run_container
 
 SessionDep = Annotated[Session, Depends(get_session)]
 
@@ -164,6 +164,14 @@ async def scan_commit(
                 pass
             else:
                 output_list.append({f"{filename}": "ERR"})
+
+
+            # sandbox
+            image_name = "sandbox-container"
+            context_path = "./sandbox/benchmarker/Dockerfile"
+            command = "/path/to/your-executable"
+            build_container(image_name, context_path)
+            run_container(image_name=image_name, command=command)
 
     # delete previous scan of this commit in the repo
     previous_scan = session.exec(select(Scan).filter(Scan.commit_sha == params.sha, Scan.repo_name == params.repo)).first()
