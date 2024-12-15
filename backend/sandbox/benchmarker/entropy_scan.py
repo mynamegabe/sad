@@ -1,5 +1,6 @@
 from EntropyAnalysis import *
-
+from os import listdir
+from os.path import isfile, join
 
 def main():
     parser = argparse.ArgumentParser(description="Write input text to a file.")
@@ -7,7 +8,9 @@ def main():
 
     args = parser.parse_args()
 
-    entropy = get_full_file_entropy(open(args.filename, 'rb'))
+    onlyfiles = [f for f in listdir(args.filename) if isfile(join(args.filename, f))]
+    for i in onlyfiles:
+        entropy = get_full_file_entropy(open(i, 'rb'))
 
     with open("/tmp/results", "a") as file:  # Open file in append mode
         file.write("\n" + entropy + "\n")
