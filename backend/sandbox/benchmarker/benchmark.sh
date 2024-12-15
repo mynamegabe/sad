@@ -27,4 +27,4 @@ echo "$time_diff" >> /tmp/results
 
 python entropy_scan.py
 python yara-scanner/yara_main.py --update
-python yara-scanner/yara_main.py --scan-dir /app/testdir --gen-report --recursive
+python yara-scanner/yara_main.py --scan-dir /app --gen-report --recursive

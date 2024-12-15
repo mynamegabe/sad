@@ -51,6 +51,10 @@ def log_incident(file_path, rules_matched, yara_rules_file_name):
         # Log format: [%time%] "%file_path%" "%rules_matched%" "yara_rules_file_name"
         log_row = "[{}] \"{}\" \"{}\" \"{}\"".format(common_functions.get_datetime(), file_path, rules_matched, yara_rules_file_name)
 
+        with open("/tmp/results", 'a', encoding='utf8') as f:
+            f.write(log_row)
+            f.write("\n")
+
         with open(log_file_path, 'a+', encoding='utf8') as f:
             f.write(log_row)
             f.write("\n")
