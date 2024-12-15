@@ -1,20 +1,23 @@
 from EntropyAnalysis import *
 from os import listdir
 from os.path import isfile, join
+import argparse
 
 def main():
     parser = argparse.ArgumentParser(description="Write input text to a file.")
-    parser.add_argument("--filename", type=str, default="output.txt", help="The name of the file to scan")
+    parser.add_argument("--filename", type=str, default="/tmp/results", help="The name of the file to scan")
 
     args = parser.parse_args()
 
     onlyfiles = [f for f in listdir(args.filename) if isfile(join(args.filename, f))]
     for i in onlyfiles:
-        entropy = get_full_file_entropy(open(i, 'rb'))
+        entropy = get_full_file_entropy(open(args.filename + '/' + i, 'rb'))
 
-    with open("/tmp/results", "a") as file:  # Open file in append mode
-        file.write("\n" + entropy + "\n")
+        with open("/tmp/results", "a") as file:  # Open file in append mode
+            file.write("\n" + i + " " + entropy + "\n")
 
+if __name__ == "__main__":
+    main()
 
 # """
 # 5.325985252430504

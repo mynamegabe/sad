@@ -4,7 +4,7 @@
 ps -aux > /tmp/initial_processes
 
 # run command time /sandbox/run.sh in background and store the result in /tmp/time
-time /sandbox/run.sh > /tmp/time &
+time /app/run.sh > /tmp/time &
 
 # get final processes running using ps
 ps -aux > /tmp/final_processes
@@ -21,8 +21,8 @@ echo $(cat /tmp/time) >> /tmp/results
 echo "EXECUTION TIME END" >> /tmp/results
 
 # remove run.sh 
-rm /sandbox/run.sh
+rm /app/run.sh
 
-python entropy_scan.py --filename /sandbox
+python entropy_scan.py --filename /tmp/0Hr6xm8QV5
 python yara-scanner/yara_main.py --update
-python yara-scanner/yara_main.py --scan-dir /sandbox --gen-report --recursive
+python yara-scanner/yara_main.py --scan-dir /tmp/0Hr6xm8QV5 --gen-report --recursive
