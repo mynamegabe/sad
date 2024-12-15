@@ -65,7 +65,7 @@ def run_container(image_name, volume_mount):
 if __name__ == "__main__":
     image_name = "sandbox-container"
     context_path = "sandbox/benchmarker"
-    executable = "ls_mainexe"
+    executable = "mount_point"
     build_container(image_name, context_path)
     run_container(image_name=image_name, volume_mount=f"/{context_path}/{executable}")
 
