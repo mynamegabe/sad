@@ -19,43 +19,57 @@ def build_container(image_name, context_path):
         print(f"Error during Docker build: {e}")
         return 1
 
+import pathlib
+
 def run_container(image_name, volume_mount):
     # run docker container
     try:
         client = docker.from_env()
         # container = client.containers.run(image_name, command=command, remove=True)
-        volume_bindings = { os.getcwd()+volume_mount: { 'bind': '/sandbox', 'mode': 'rw', }, }
+        mount_path = pathlib.Path(os.getcwd()) / volume_mount
+        volume_bindings = { mount_path: { 'bind': '/sandbox', 'mode': 'rw', }, }
+        # volume_bindings = { os.getcwd()+"/"+volume_mount: { 'bind': '/sandbox', 'mode': 'rw', }, }
         container = client.containers.run(image_name, volumes=volume_bindings, detach=True)
-        print("Container ran successfully. Output:")
+        # print("Container ran successfully. Output:")
         print(f"Container '{container}' is running...")
 
-        return container
-        # # Wait for the container to finish
-        # exit_status = container.wait()
-        # if exit_status["StatusCode"] != 0:
-        #     raise RuntimeError(f"Container exited with error: {exit_status}")
+        # return container
+        # Wait for the container to finish
+        exit_status = container.wait()
+        if exit_status["StatusCode"] != 0:
+            raise RuntimeError(f"Container exited with error: {exit_status}")
 
-        # # Copy the /tmp/output file from the container
-        # output_archive = container.get_archive("/tmp/output")
-        # output_tar_data, _ = output_archive
-
-        # # Extract file content from the tar archive
-        # import tarfile
-        # import io
-
-        # with tarfile.open(fileobj=io.BytesIO(output_tar_data)) as tar:
-        #     for member in tar.getmembers():
-        #         if member.name == "output":  # Extract the desired file
-        #             file_data = tar.extractfile(member).read()
-        #             print("Content of /tmp/output:")
-        #             print(file_data.decode())
-        #             break
-    except docker.errors.ContainerError as e:
-        print(f"Error running container: {e}")
-    except docker.errors.ImageNotFound as e:
-        print(f"Image not found: {e}")
-    except docker.errors.APIError as e:
-        print(f"API error: {e}")
+        # Extract /tmp/results file from container and extract with get_archive
+        output, _ = container.get_archive("/tmp/results")
+        dest_path = os.path.join(os.getcwd(), "output.tar")
+        with open(dest_path, 'wb') as f:
+            for chunk in output:
+                f.write(chunk)
+                
+        # decompress the output
+        import tarfile
+        with tarfile.open(dest_path, 'r') as tar:
+            tar.extractall(path=os.path.join(os.getcwd(), "output"))
+        print(f"Output saved to {os.path.join(os.getcwd(), 'output')}")
+        
+        # read the output
+        output = []
+        for root, _, files in os.walk(os.path.join(os.getcwd(), "output")):
+            for file in files:
+                with open(os.path.join(root, file), 'r') as f:
+                    output.append(f.read())
+        
+        # delete the output
+        os.remove(dest_path)
+        import shutil
+        shutil.rmtree(os.path.join(os.getcwd(), "output"))
+        
+        # print(f"Output: {output}")        
+        return output
+    except Exception as e:
+        print(f"Error during Docker run: {e}")
+        return 1
+    
     # finally:
     #     # Cleanup container and context
     #     if container:

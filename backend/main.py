@@ -165,6 +165,13 @@ async def scan_commit(
             else:
                 output_list.append({f"{filename}": "ERR"})
 
+
+            # sandbox
+            # image_name = "sandbox-container"
+            # context_path = "./sandbox/benchmarker/Dockerfile"
+            # build_container(image_name, context_path)
+            # run_container(image_name=image_name)
+
     # delete previous scan of this commit in the repo
     previous_scan = session.exec(select(Scan).filter(Scan.commit_sha == params.sha, Scan.repo_name == params.repo)).first()
     if previous_scan:
@@ -216,14 +223,16 @@ async def sandbox_test(file: UploadFile = File(None), script: str = Form(None)):
             f.write(file.file.read())
     # save script
     if script:
+        # convert to lf
+        script = script.replace("\r\n", "\n")
         with open(f"tmp/{random_folder}/run.sh", "w") as f:
             f.write(script)
     # build container
     image_name = "sandbox-container"
-    context_path = "./sandbox/benchmarker/Dockerfile"
+    context_path = "./sandbox/benchmarker/"
     build_container(image_name, context_path)
-    run_container(image_name=image_name, volume=f"tmp/{random_folder}")
-    return {"status": "success"}
+    output = run_container(image_name=image_name, volume_mount=f"tmp/{random_folder}")
+    return {"status": "success", "output": output}
 
 if __name__ == "__main__":
     uvicorn.run("main:app", host="0.0.0.0", port=80, reload=True)

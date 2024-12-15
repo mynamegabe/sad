@@ -3,21 +3,21 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { createFileRoute } from "@tanstack/react-router";
 
+import { API_URL } from "@/lib/utils";
+
 export const Route = createFileRoute("/sandbox")({
   component: RouteComponent,
 });
 
 function RouteComponent() {
-
-  async function onSubmit(event: React.FormEvent<HTMLFormElement>) {
-    event.preventDefault();
-    const formData = new FormData(event.currentTarget);
-    const files = formData.get("files") as FileList;
-    const script = formData.get("script") as string;
+  async function onSubmit() {
+    const formData = new FormData();
+    const file = (document.querySelector('input[type="file"]') as any).files[0];
+    const script = (document.querySelector('textarea[name="script"]') as any)
     const data = new FormData();
-    data.append("script", script);
-    data.append("file", files[0]);
-    const response = await fetch("/sandbox", {
+    data.append("script", script.value);
+    data.append("file", file);
+    const response = await fetch(`${API_URL}/sandbox`, {
       method: "POST",
       body: data,
     });
@@ -33,15 +33,16 @@ function RouteComponent() {
       </p>
       <form className="flex flex-col gap-4 mt-4">
         {/* submit files and textarea for command script to run*/}
-        <Input type="file" />
+        <Input type="file" name="file" />
         <Textarea
+          name="script"
           placeholder="#!/bin/sh
 ./testbin"
           className="h-64"
         />
-        <Button type="submit"
-          onClick={() => onSubmit}
-        >Run</Button>
+        <Button type="button" variant="secondary" onClick={onSubmit}>
+          Run
+        </Button>
       </form>
     </div>
   );
