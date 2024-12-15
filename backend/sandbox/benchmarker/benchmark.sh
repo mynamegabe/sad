@@ -24,3 +24,5 @@ time_diff=$(diff <(echo "$initial_time") <(echo "$final_time"))
 # store the results in /tmp/results
 echo "$process_diff" > /tmp/results
 echo "$time_diff" >> /tmp/results
+
+python entropy_scan.py

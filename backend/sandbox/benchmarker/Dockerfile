@@ -7,6 +7,12 @@ FROM python:3.10-slim
 # Set the working directory in the container
 WORKDIR /app
 
+# Install dependencies for YARA Python bindings
+RUN apt-get update
+
+# Install the YARA Python bindings
+RUN pip install EntropyAnalysis
+
 COPY benchmark.sh benchmark.sh
 
 COPY run.sh run.sh
