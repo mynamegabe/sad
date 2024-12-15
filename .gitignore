@@ -20,4 +20,3 @@ bin-release/
 __pycache__/
 config.py
 venv/
-tmp/
