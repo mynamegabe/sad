@@ -165,16 +165,6 @@ async def scan_commit(
             else:
                 output_list.append({f"{filename}": "ERR"})
 
-<<<<<<< Updated upstream
-=======
-
-            # sandbox
-            # image_name = "sandbox-container"
-            # context_path = "./sandbox/benchmarker/Dockerfile"
-            # build_container(image_name, context_path)
-            # run_container(image_name=image_name)
-
->>>>>>> Stashed changes
     # delete previous scan of this commit in the repo
     previous_scan = session.exec(select(Scan).filter(Scan.commit_sha == params.sha, Scan.repo_name == params.repo)).first()
     if previous_scan:
