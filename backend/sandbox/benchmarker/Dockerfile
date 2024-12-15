@@ -5,7 +5,7 @@
 FROM python:3.10-slim
 
 # Set the working directory in the container
-WORKDIR /app
+WORKDIR /sandbox
 
 # Install dependencies for YARA Python bindings
 RUN apt-get update && apt-get install -y \
@@ -20,7 +20,6 @@ RUN pip install EntropyAnalysis
 
 COPY benchmark.sh benchmark.sh
 
-COPY run.sh run.sh
-
 # Start a shell, execute the binary from the command line, and then run ps
-CMD sh -c "./run.sh $1"
+CMD sh -c "./benchmark.sh"
+

@@ -1,0 +1,6 @@
+ "AAAAYInlM"
+ 
+
+
+ 
+      $pattern2 = "/OiJAAAAYInlM"
