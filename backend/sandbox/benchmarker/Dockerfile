@@ -8,9 +8,14 @@ FROM python:3.10-slim
 WORKDIR /app
 
 # Install dependencies for YARA Python bindings
-RUN apt-get update
+RUN apt-get update && apt-get install -y \
+    build-essential \
+    libffi-dev \
+    libmagic-dev \
+    yara
 
 # Install the YARA Python bindings
+RUN pip install yara-python 
 RUN pip install EntropyAnalysis
 
 COPY benchmark.sh benchmark.sh
