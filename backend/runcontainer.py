@@ -1,8 +1,6 @@
 import docker
 import os
-
-
-
+import pathlib
 
 def build_container(image_name, context_path):
     # build docker container
@@ -27,7 +25,9 @@ def run_container(image_name, volume_mount):
         client = docker.from_env()
         # container = client.containers.run(image_name, command=command, remove=True)
         mount_path = pathlib.Path(os.getcwd()) / volume_mount
-        volume_bindings = { mount_path: { 'bind': '/sandbox', 'mode': 'rw', }, }
+
+        print(mount_path)
+        volume_bindings = { mount_path: { 'bind': '/mount_point', 'mode': 'rw', }, }
         # volume_bindings = { os.getcwd()+"/"+volume_mount: { 'bind': '/sandbox', 'mode': 'rw', }, }
         container = client.containers.run(image_name, volumes=volume_bindings, detach=True)
         # print("Container ran successfully. Output:")
