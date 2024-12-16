@@ -5,4 +5,4 @@ export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs))
 }
 
-export const API_URL = "https://pleasantly-inspired-parakeet.ngrok-free.app"
+export const API_URL = "http://localhost"
