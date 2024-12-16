@@ -5,7 +5,7 @@ import argparse
 
 def main():
     parser = argparse.ArgumentParser(description="Write input text to a file.")
-    parser.add_argument("--filename", type=str, default="/tmp/results", help="The name of the file to scan")
+    parser.add_argument("--filename", type=str, help="The name of the file to scan")
 
     args = parser.parse_args()
 
@@ -14,7 +14,7 @@ def main():
         entropy = get_full_file_entropy(open(args.filename + '/' + i, 'rb'))
 
         with open("/tmp/results", "a") as file:  # Open file in append mode
-            file.write("\n" + i + " " + entropy + "\n")
+            file.write("\n" + i + " " + str(entropy))
 
 if __name__ == "__main__":
     main()
