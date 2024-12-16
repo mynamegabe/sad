@@ -25,8 +25,6 @@ COPY benchmark.sh benchmark.sh
 COPY . .
 
 # Start a shell, execute the binary from the command line, and then run ps
-# CMD ["/app/benchmark.sh"]
-CMD ["/benchmark.sh"]
+CMD ["/app/benchmark.sh"]
 # CMD ["sh"]
-# CMD sh -c "./benchmark.sh"
 
