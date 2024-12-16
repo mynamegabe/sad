@@ -23,6 +23,6 @@ echo "EXECUTION TIME END" >> /tmp/results
 # remove run.sh 
 rm /app/run.sh
 
-python entropy_scan.py --filename /tmp/0Hr6xm8QV5
+python entropy_scan.py --filename /mount_point
 python yara-scanner/yara_main.py --update
-python yara-scanner/yara_main.py --scan-dir /tmp/0Hr6xm8QV5 --gen-report --recursive
+python yara-scanner/yara_main.py --scan-dir /mount_point --gen-report --recursive
