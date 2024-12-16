@@ -28,9 +28,7 @@ def run_container(image_name, volume_mount):
 
         print(mount_path)
         volume_bindings = { mount_path: { 'bind': '/mount_point', 'mode': 'rw', }, }
-        # volume_bindings = { os.getcwd()+"/"+volume_mount: { 'bind': '/sandbox', 'mode': 'rw', }, }
         container = client.containers.run(image_name, volumes=volume_bindings, detach=True)
-        # print("Container ran successfully. Output:")
         print(f"Container '{container}' is running...")
 
         # return container
@@ -70,10 +68,12 @@ def run_container(image_name, volume_mount):
         print(f"Error during Docker run: {e}")
         return 1
     
-    # finally:
-    #     # Cleanup container and context
-    #     if container:
-    #         container.remove(force=True)
+    finally:
+        # Cleanup container and context
+        if container:
+            container.remove(force=True)
+            print(f"Container '{container.id}' removed.")
+
 
 
 if __name__ == "__main__":
